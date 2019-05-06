@@ -1,21 +1,15 @@
 pipeline:
-  install:
-    image: alpine
-    commands:
-    - apk --update add curl
-    - curl --silent --output terraform.zip "https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip"
-    - unzip terraform.zip ; rm -f terraform.zip; chmod +x terraform
-
   astronomer-cloud-dev:
     image: alpine
     secrets: [ google_application_credentials ]
     commands:
+    - apk --update add git terraform
     - apk add --no-cache ca-certificates openssl
     - export GOOGLE_CREDENTIALS=$${GOOGLE_APPLICATION_CREDENTIALS}
     - cd astronomer-cloud-dev
-    - ../terraform init
-    - ../terraform validate
-    - ../terraform apply -auto-approve
+    - terraform init
+    - terraform validate
+    - terraform apply -auto-approve
 
   notify:
     image: plugins/slack
