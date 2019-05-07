@@ -3,7 +3,9 @@ pipeline:
     image: alpine
     secrets: [ google_application_credentials ]
     commands:
-    - apk --update add git terraform
+    - apk --update add git curl wget
+    - curl --silent --output terraform.zip "https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip"
+    - unzip terraform.zip -d /usr/bin ; rm -f terraform.zip; export PATH="$PATH:/usr/bin"
     - apk add --no-cache ca-certificates openssl
     - export GOOGLE_CREDENTIALS=$${GOOGLE_APPLICATION_CREDENTIALS}
     - cd astronomer-cloud-dev
