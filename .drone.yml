@@ -32,4 +32,4 @@ pipeline:
     webhook: $${slack_webhook}
     channel: platform
     when:
-      status: [ failure, changed ]
+      status: [ failure, success, changed ]
