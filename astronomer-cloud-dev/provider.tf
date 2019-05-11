@@ -10,7 +10,7 @@ provider google-beta {
 
 terraform {
   backend "gcs" {
-    bucket = "tf-state-ian"
+    bucket = "astronomer-cloud-dev-236021-terraform"
     prefix = "terraform/state"
   }
 }

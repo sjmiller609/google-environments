@@ -13,3 +13,7 @@ output "postgres_user" {
 output "postgres_password" {
   value = "${module.environment.postgres_password}"
 }
+
+output "container_registry_bucket_name" {
+  value = "${module.environment.container_registry_bucket_name}"
+}
