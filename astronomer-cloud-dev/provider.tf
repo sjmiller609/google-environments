@@ -1,11 +1,11 @@
 provider google {
-  region  = "us-east4"
-  project = "astronomer-cloud-dev-236021"
+  region  = "${var.region}"
+  project = "${var.project}"
 }
 
 provider google-beta {
-  region  = "us-east4"
-  project = "astronomer-cloud-dev-236021"
+  region  = "${var.region}"
+  project = "${var.project}"
 }
 
 terraform {
@@ -13,4 +13,8 @@ terraform {
     bucket = "astronomer-cloud-dev-236021-terraform"
     prefix = "terraform/state"
   }
+}
+
+data "google_container_engine_versions" "gke" {
+  location = "${var.region}"
 }

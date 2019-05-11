@@ -20,8 +20,9 @@ module "environment" {
   machine_type                     = "f1-micro"
   min_node_count                   = 1
   max_node_count                   = 20
-  node_version                     = "latest"
+  min_master_version               = "${data.google_container_engine_versions.gke.latest_master_version}"
+  node_version                     = "${data.google_container_engine_versions.gke.latest_node_version}"
 
-  region = "us-east4"
-  zone   = "us-east4-a"
+  region = "${var.region}"
+  zone   = "${var.zone}"
 }
