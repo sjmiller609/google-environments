@@ -28,3 +28,25 @@ This terraform uses https://github.com/astronomer/terraform/tree/master/gcp as t
     ```bash
     terraform apply
     ```
+
+## Access Kubernetes Cluster
+
+1. SSH into Bastion using IAP:
+
+    ```bash
+    gcloud beta compute ssh bastion --project astronomer-cloud-dev-236021 --tunnel-through-iap
+    ```
+  
+1. Generate Kubeconfig entry to connect to k8s cluster:
+
+    ```bash
+    gcloud beta container clusters get-credentials cloud-dev-cluster --region us-east4 --project astronomer-cloud-dev-236021 --internal-ip
+    ```
+    
+    Make sure that `--internal-ip` is passed to the command.
+    
+1. Test `kubectl` command:
+
+    ```bash
+    kubectl get po --all-namespaces
+    ```
