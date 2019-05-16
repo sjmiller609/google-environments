@@ -50,3 +50,25 @@ This terraform uses https://github.com/astronomer/terraform/tree/master/gcp as t
     ```bash
     kubectl get po --all-namespaces
     ```
+
+1. In order to access the k8s cluster as an admin:
+    
+    * Run the following command
+     
+      ```bash
+      gcloud auth login
+      ```
+    
+    * To authenticate with the cluster: 
+      
+      ```bash
+      gcloud beta container clusters get-credentials cloud-dev-cluster --region us-east4 --project astronomer-cloud-dev-236021 --internal-ip
+      ```
+      
+    * Test it using the following command:
+    
+      ```bash
+      kubectl create ns astronomer
+      ```
+
+    To run Admin commands on the k8s cluster, the user needs to be listed in `bastion_admins` terraform variable as `bastion_admins` get [**Container Admin**](https://cloud.google.com/kubernetes-engine/docs/how-to/iam#kubernetes-engine-roles) permissions (`roles/container.admin`).
