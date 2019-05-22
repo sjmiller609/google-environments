@@ -5,12 +5,14 @@ module "environment" {
     "user:greg@astronomer.io",
     "user:kaxil@astronomer.io",
     "user:ian@astronomer.io",
+    "user:steven@astronomer.io",
   ]
 
   bastion_users = [
     "user:greg@astronomer.io",
     "user:kaxil@astronomer.io",
     "user:ian@astronomer.io",
+    "user:steven@astronomer.io",
   ]
 
   # GKE Config
