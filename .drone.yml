@@ -11,7 +11,7 @@ pipeline:
       - cd astronomer-cloud-dev
       - terraform init
       - terraform validate
-      - terraform apply -auto-approve
+     # - terraform apply -auto-approve
 
   astronomer-cloud-dev-tf-destroy:
     image: alpine
@@ -22,7 +22,7 @@ pipeline:
       - unzip terraform.zip -d /usr/bin ; rm -f terraform.zip; export PATH="$PATH:/usr/bin"
       - export GOOGLE_CREDENTIALS=$${GOOGLE_APPLICATION_CREDENTIALS}
       - cd astronomer-cloud-dev
-      - terraform destroy -auto-approve
+   #   - terraform destroy -auto-approve
     when:
       status: [ failure, success ]
 
