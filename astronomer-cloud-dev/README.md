@@ -4,6 +4,11 @@ This terraform uses https://github.com/astronomer/terraform/tree/master/gcp as t
 
 ## Steps
 
+1. Set Google application default credentials:
+    ```bash
+    gcloud auth application-default login
+    ```
+
 1. Get the latest terraform module:
 
     ```bash
