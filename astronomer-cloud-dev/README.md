@@ -1,6 +1,10 @@
 # Astronomer Cloud Dev 
 This terraform uses https://github.com/astronomer/terraform/tree/master/gcp as terraform module to create Private K8s cluster, Cloud SQL with Postgres in `astronomer-cloud-dev-236021` GCP Project.
 
+## Architecture
+
+![Astronomer GCP Architecture](images/Astronomer-GCP-white-background.png)
+
 
 ## Steps
 
