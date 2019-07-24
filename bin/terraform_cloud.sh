@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd $DIRECTORY
+
 echo $GOOGLE_CREDENTIAL_FILE_CONTENT > /tmp/account.json
 
 set -xe
@@ -31,9 +33,9 @@ PLAN_FILE="tfplan"
 # run of this environment.
 
 # get list of clusters
-CLUSTERS=$(gcloud container clusters list)
+CLUSTERS="$(gcloud container clusters list --format="value(name)" | tr '\r\n' ' ')"
 KUBECONFIG_VAR_LINE=""
-if [ $CLUSTERS == *$DEPLOYMENT_ID-cluster* ]; then
+if [[ "$CLUSTERS" == *$DEPLOYMENT_ID-cluster* ]]; then
 
   # whitelist our current IP for kube management API
   gcloud container clusters update $DEPLOYMENT_ID-cluster --enable-master-authorized-networks --master-authorized-networks="$(curl icanhazip.com)/32" --zone=us-east4
@@ -41,7 +43,7 @@ if [ $CLUSTERS == *$DEPLOYMENT_ID-cluster* ]; then
   # copy the kubeconfig from the terraform state
   terraform state pull | jq -r '.resources[] | select(.module == "module.astronomer_cloud") | select(.name == "kubeconfig") | .instances[0].attributes.content' > kubeconfig
   chmod 755 kubeconfig
-  KUBECONFIG_VAR_LINE="-var 'kubeconfig_path=$(pwd)/kubeconfig'"
+  KUBECONFIG_VAR_LINE="-var kubeconfig_path=$(pwd)/kubeconfig"
 fi
 
 # Do the plan step and quit

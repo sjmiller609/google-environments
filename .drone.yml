@@ -6,7 +6,7 @@ steps:
 - name: deploy_cloud_to_staging
   image: sjmiller609/helm-kubectl-terraform:latest
   environment:
-    DEPLOYMENT_ID: stage
+    DEPLOYMENT_ID: staging
     PROJECT: astronomer-cloud-staging
     DIRECTORY: stage/cloud
     DNS_ZONE: staging-zone
@@ -45,96 +45,96 @@ steps:
       - push
     status:
       - success
-      - failure
+      # - failure
     repo:
       - astronomer/google-environments
 
-# - name: terraform_plan_production
-#   image: sjmiller609/helm-kubectl-terraform:latest
-#   environment:
-#     TF_PLAN: true
-#     DEPLOYMENT_ID: stage
-#     PROJECT: astronomer-cloud-prod
-#     DIRECTORY: prod/cloud
-#     ZONAL: false
-#     GOOGLE_CREDENTIAL_FILE_CONTENT:
-#       from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
-#   commands:
-#     - bin/terraform_cloud.sh.sh
-#   when:
-#     event:
-#       - push
-#     status:
-#       - success
-#     repo:
-#       - astronomer/google-environments
-# 
-# - name: notify_promotion_production
-#   image: plugins/slack
-#   settings:
-#     webhook:
-#       from_secret: WEBHOOK_URL
-#     channel: ci-debug
-#     username: terraform-ci
-#     template: >
-#       Review the plan output here: {{build.link}}
-# 
-#       To release, run:
-# 
-#       ```
-#       # go to https://cloud.drone.io/account for personal access token
-#       export DRONE_SERVER=https://cloud.drone.io
-#       export DRONE_TOKEN=your-token
-#       drone build promote astronomer/terraform-google-astronomer-cloud ${DRONE_BUILD_NUMBER} production
-#       ```
-#   when:
-#     event:
-#       - push
-#     status:
-#       - success
-#     repo:
-#       - astronomer/google-environments
-# 
-# - name: deploy_to_production
-#   image: sjmiller609/helm-kubectl-terraform:latest
-#   environment:
-#     GOOGLE_CREDENTIAL_FILE_CONTENT:
-#       from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
-#   commands:
-#     - TF_APPLY=1 pipeline/release_prod_cloud.sh
-#   when:
-#     event:
-#       - promote
-#     status:
-#       - success
-#     repo:
-#       - astronomer/google-environments
-#     target:
-#       - production
-# 
-# - name: notify_prod_updated
-#   image: plugins/slack
-#   settings:
-#     webhook:
-#       from_secret: WEBHOOK_URL
-#     channel: ci-debug
-#     username: terraform-ci
-#     template: >
-#       {{repo.name}}
-#       {{#success build.status}}
-#       prod cloud updated! :sunglasses:
-#       https://app.prod.astronomer-staging.com
-#       {{else}}
-#       ERROR: update of prod cloud failed!
-#       build link: {{build.link}}
-#       {{/success}}
-#   when:
-#     event:
-#       - promote
-#     status:
-#       - success
-#       - failure
-#     repo:
-#       - astronomer/google-environments
-#     target:
-#       - production
+- name: terraform_plan_production
+  image: sjmiller609/helm-kubectl-terraform:latest
+  environment:
+    TF_PLAN: true
+    DEPLOYMENT_ID: prod
+    PROJECT: astronomer-cloud-prod
+    DIRECTORY: prod/cloud
+    ZONAL: false
+    GOOGLE_CREDENTIAL_FILE_CONTENT:
+      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
+  commands:
+    - bin/terraform_cloud.sh
+  when:
+    event:
+      - push
+    status:
+      - success
+    repo:
+      - astronomer/google-environments
+
+- name: notify_promotion_production
+  image: plugins/slack
+  settings:
+    webhook:
+      from_secret: WEBHOOK_URL
+    channel: ci-debug
+    username: terraform-ci
+    template: >
+      Review the plan output here: {{build.link}}
+
+      To release, run:
+
+      ```
+      # go to https://cloud.drone.io/account for personal access token
+      export DRONE_SERVER=https://cloud.drone.io
+      export DRONE_TOKEN=your-token
+      drone build promote astronomer/terraform-google-astronomer-cloud ${DRONE_BUILD_NUMBER} production
+      ```
+  when:
+    event:
+      - push
+    status:
+      - success
+    repo:
+      - astronomer/google-environments
+
+- name: deploy_to_production
+  image: sjmiller609/helm-kubectl-terraform:latest
+  environment:
+    GOOGLE_CREDENTIAL_FILE_CONTENT:
+      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
+  commands:
+    - TF_APPLY=1 pipeline/release_prod_cloud.sh
+  when:
+    event:
+      - promote
+    status:
+      - success
+    repo:
+      - astronomer/google-environments
+    target:
+      - production
+
+- name: notify_prod_updated
+  image: plugins/slack
+  settings:
+    webhook:
+      from_secret: WEBHOOK_URL
+    channel: ci-debug
+    username: terraform-ci
+    template: >
+      {{repo.name}}
+      {{#success build.status}}
+      prod cloud updated! :sunglasses:
+      https://app.prod.astronomer-staging.com
+      {{else}}
+      ERROR: update of prod cloud failed!
+      build link: {{build.link}}
+      {{/success}}
+  when:
+    event:
+      - promote
+    status:
+      - success
+      # - failure
+    repo:
+      - astronomer/google-environments
+    target:
+      - production
