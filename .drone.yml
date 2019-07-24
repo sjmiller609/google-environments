@@ -15,7 +15,7 @@ steps:
     GOOGLE_CREDENTIAL_FILE_CONTENT:
       from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
   commands:
-    - bin/terraform_cloud
+    - bin/terraform_cloud.sh
   when:
     event:
       - push
@@ -34,11 +34,10 @@ steps:
     template: >
       {{repo.name}}
       {{#success build.status}}
-      deployment of version {{build.tag}} to stage cloud succeeded! :sunglasses:
+      deployment to stage cloud succeeded!
       https://app.staging.astronomer-staging.com
       {{else}}
-      deployment of version {{build.tag}} to stage cloud
-      ERROR: pipeline failed!
+      ERROR deployment to stage cloud failed!
       build link: {{build.link}}
       {{/success}}
   when:
@@ -61,7 +60,7 @@ steps:
 #     GOOGLE_CREDENTIAL_FILE_CONTENT:
 #       from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
 #   commands:
-#     - bin/terraform_cloud.sh
+#     - bin/terraform_cloud.sh.sh
 #   when:
 #     event:
 #       - push

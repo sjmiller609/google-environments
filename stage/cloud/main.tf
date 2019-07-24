@@ -8,10 +8,7 @@ variable "kubeconfig_path" {
 module "astronomer_cloud" {
 
   source  = "astronomer/astronomer-cloud/google"
-
-  # we will use latest for stage cloud,
-  # so let's omit this argument
-  # version = "0.1.191"
+  version = "0.1.196"
 
   deployment_id    = var.deployment_id
   dns_managed_zone = "staging-zone"
