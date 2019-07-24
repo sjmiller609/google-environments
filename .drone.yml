@@ -9,10 +9,8 @@ steps:
     DEPLOYMENT_ID: staging
     PROJECT: astronomer-cloud-staging
     DIRECTORY: stage/cloud
-    DNS_ZONE: staging-zone
     ZONAL: false
     TF_AUTO_APPROVE: true
-    TF_TWO_STEP_APPLY: true
     GOOGLE_CREDENTIAL_FILE_CONTENT:
       from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
   commands:
@@ -59,8 +57,9 @@ steps:
     DIRECTORY: prod/cloud
     ZONAL: false
     GOOGLE_CREDENTIAL_FILE_CONTENT:
-      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
+      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
   commands:
+    - bin/compare_stage_and_prod_cloud.sh
     - bin/terraform_cloud.sh
   when:
     event:
@@ -99,10 +98,15 @@ steps:
 - name: deploy_to_production
   image: sjmiller609/helm-kubectl-terraform:latest
   environment:
+    DEPLOYMENT_ID: prod
+    PROJECT: astronomer-cloud-prod
+    DIRECTORY: prod/cloud
+    ZONAL: false
     GOOGLE_CREDENTIAL_FILE_CONTENT:
-      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
+      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
   commands:
-    - TF_APPLY=1 pipeline/release_prod_cloud.sh
+    - bin/compare_stage_and_prod_cloud.sh
+    - bin/terraform_cloud.sh
   when:
     event:
       - promote

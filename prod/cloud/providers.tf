@@ -1,13 +1,13 @@
 provider "google" {
   region  = "us-east4"
   zone    = "us-east4-a"
-  project = "astronomer-prod-cloud"
+  project = "astronomer-cloud-prod"
 }
 
 provider "google-beta" {
   region  = "us-east4"
   zone    = "us-east4-a"
-  project = "astronomer-prod-cloud"
+  project = "astronomer-cloud-prod"
 }
 
 provider "acme" {
