@@ -27,13 +27,6 @@ gcloud config set project $PROJECT
 
 PLAN_FILE="tfplan"
 
-# Only turn on auto-approve when specified.
-# Do not target a plan file.
-TF_AUTO_APPROVE_LINE=""
-if [ $TF_AUTO_APPROVE ]; then
-  TF_AUTO_APPROVE_LINE="--auto-approve"
-fi
-
 # If the cluster already exists, then we need
 # to set up some things in the local environment.
 # The block below is executed except for on the first
@@ -56,6 +49,11 @@ fi
 
 if [ $TF_DESTROY ]; then
 
+  if [ ! $TF_AUTO_APPROVE ]; then
+    echo "ERROR: will not destroy without TF_AUTO_APPROVE set"
+    exit 1
+  fi
+
   # delete everything from kube
   helm init --client-only
   helm del $(helm ls --all --short) --purge
@@ -75,20 +73,25 @@ if [ $TF_DESTROY ]; then
     -var "deployment_id=$DEPLOYMENT_ID" \
     -lock=false \
     -input=false \
-    $KUBECONFIG_VAR_LINE \
-    $TF_AUTO_APPROVE_LINE
+    $KUBECONFIG_VAR_LINE
+    --auto-approve
 
   exit 0
 fi
 
 if [ $TF_TWO_STEP_APPLY ]; then
 
+  if [ ! $TF_AUTO_APPROVE ]; then
+    echo "ERROR: will not two step apply without TF_AUTO_APPROVE set"
+    exit 1
+  fi
+
   terraform apply \
     -var "deployment_id=$DEPLOYMENT_ID" \
     -lock=false \
     -input=false \
     $KUBECONFIG_VAR_LINE \
-    $TF_AUTO_APPROVE_LINE \
+    --auto-approve \
     --target=module.astronomer_cloud.module.gcp
 
   terraform apply \
@@ -96,18 +99,12 @@ if [ $TF_TWO_STEP_APPLY ]; then
     -lock=false \
     -input=false \
     $KUBECONFIG_VAR_LINE \
-    $TF_AUTO_APPROVE_LINE
+    --auto-approve
 
   exit 0
 fi
 
-terraform plan \
-  -var "deployment_id=$DEPLOYMENT_ID" \
-  $KUBECONFIG_VAR_LINE \
-  -lock=false \
-  -input=false \
-  -out=$PLAN_FILE
-
+STATE_BUCKET="astronomer-$DEPLOYMENT_ID-terraform-state"
 # Do the plan step and quit
 # if TF_PLAN is set.
 # Otherwise, proceed to the apply step
@@ -116,17 +113,34 @@ if [ $TF_PLAN ]; then
 	echo "\n Deleting old Terraform plan file"
 	gsutil rm gs://${STATE_BUCKET}/ci/$PLAN_FILE || echo "\n An old state file does not exist in state bucket, proceeding..."
 
+  terraform plan \
+    -var "deployment_id=$DEPLOYMENT_ID" \
+    $KUBECONFIG_VAR_LINE \
+    -lock=false \
+    -input=false \
+    -out=$PLAN_FILE
+
 	gsutil cp $PLAN_FILE gs://${STATE_BUCKET}/ci/$PLAN_FILE
   echo "Plan file uploaded"
   exit 0
 
 fi
 
+if [ $TF_AUTO_APPROVE ]; then
 
+  terraform apply \
+    --auto-approve \
+    -var "deployment_id=$DEPLOYMENT_ID" \
+    $KUBECONFIG_VAR_LINE \
+    -lock=false \
+    -input=false
+
+  exit 0
+fi
+
+# apply using plan file
+gsutil cp gs://${STATE_BUCKET}/ci/$PLAN_FILE $PLAN_FILE 
 terraform apply \
-  -var "deployment_id=$DEPLOYMENT_ID" \
   -lock=false \
   -input=false \
-  $KUBECONFIG_VAR_LINE \
-  $TF_AUTO_APPROVE_LINE \
   $PLAN_FILE

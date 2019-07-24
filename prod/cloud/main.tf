@@ -15,6 +15,8 @@ data "google_storage_object_signed_url" "privkey" {
   path   = "privkey.pem"
 }
 
+# for this to work, the content type in the metadata on the
+# bucket objects must be "text/plain; charset=utf-8"
 data "http" "fullchain" {
   url = data.google_storage_object_signed_url.fullchain.signed_url
 }
