@@ -30,7 +30,7 @@ data "http" "privkey" {
 module "astronomer_cloud" {
 
   source  = "astronomer/astronomer-cloud/google"
-  version = "0.1.202"
+  version = "0.1.204"
 
   deployment_id          = var.deployment_id
   email                  = "steven@astronomer.io"
@@ -39,6 +39,7 @@ module "astronomer_cloud" {
   enable_gvisor          = false
   kubeconfig_path        = var.kubeconfig_path
   do_not_create_a_record = true
+  lets_encrypt           = false
   base_domain            = var.base_domain
 
   tls_cert = data.http.fullchain.body
