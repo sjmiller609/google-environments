@@ -30,12 +30,13 @@ module "astronomer_cloud" {
   source  = "astronomer/astronomer-cloud/google"
   version = "0.1.200"
 
-  deployment_id    = var.deployment_id
-  email            = "steven@astronomer.io"
-  zonal_cluster    = false
-  management_api   = "public"
-  enable_gvisor    = false
-  kubeconfig_path  = var.kubeconfig_path
+  deployment_id          = var.deployment_id
+  email                  = "steven@astronomer.io"
+  zonal_cluster          = false
+  management_api         = "public"
+  enable_gvisor          = false
+  kubeconfig_path        = var.kubeconfig_path
+  do_not_create_a_record = true
 
   tls_cert = data.http.fullchain.body
   tls_key  = data.http.privkey.body
