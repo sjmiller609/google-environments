@@ -33,11 +33,14 @@ steps:
     username: terraform-ci
     template: >
       {{repo.name}}
+
       {{#success build.status}}
       deployment to stage cloud succeeded!
-      https://app.staging.astronomer-staging.com
+
+      https://app.staging.astronomer.io
       {{else}}
       ERROR deployment to stage cloud failed!
+
       build link: {{build.link}}
       {{/success}}
   when:
@@ -131,11 +134,14 @@ steps:
     username: terraform-ci
     template: >
       {{repo.name}}
+
       {{#success build.status}}
       prod cloud updated! :sunglasses:
-      https://app.prod.astronomer-staging.com
+
+      https://app.gcp0001.us-east4.astronomer.io
       {{else}}
       ERROR: update of prod cloud failed!
+
       build link: {{build.link}}
       {{/success}}
   when:

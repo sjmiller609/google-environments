@@ -30,7 +30,7 @@ data "http" "privkey" {
 module "astronomer_cloud" {
 
   source  = "astronomer/astronomer-cloud/google"
-  version = "0.1.204"
+  version = "0.1.206"
 
   deployment_id          = var.deployment_id
   email                  = "steven@astronomer.io"
