@@ -12,6 +12,7 @@ steps:
     DNS_ZONE: staging-zone
     ZONAL: false
     TF_AUTO_APPROVE: true
+    TF_TWO_STEP_APPLY: true
     GOOGLE_CREDENTIAL_FILE_CONTENT:
       from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
   commands:
