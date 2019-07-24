@@ -56,7 +56,9 @@ steps:
   image: sjmiller609/helm-kubectl-terraform:latest
   environment:
     BASE_DOMAIN: gcp0001.us-east4.astronomer.io
-    TF_PLAN: true
+    # TF_PLAN: true
+    TF_AUTO_APPROVE: true
+    TF_TWO_STEP_APPLY: true
     DEPLOYMENT_ID: prod
     PROJECT: astronomer-cloud-prod
     DIRECTORY: prod/cloud
@@ -74,81 +76,81 @@ steps:
     repo:
       - astronomer/google-environments
 
-- name: notify_promotion_production
-  image: plugins/slack
-  settings:
-    webhook:
-      from_secret: WEBHOOK_URL
-    channel: ci-debug
-    username: terraform-ci
-    template: >
-      Review the plan output here: {{build.link}}
-
-      To release, run:
-
-      ```
-      # go to https://cloud.drone.io/account for personal access token
-      export DRONE_SERVER=https://cloud.drone.io
-      export DRONE_TOKEN=your-token
-      drone build promote astronomer/google-environments ${DRONE_BUILD_NUMBER} production
-      ```
-  when:
-    event:
-      - push
-    status:
-      - success
-    repo:
-      - astronomer/google-environments
-
-- name: deploy_to_production
-  image: sjmiller609/helm-kubectl-terraform:latest
-  environment:
-    BASE_DOMAIN: gcp0001.us-east4.astronomer.io
-    DEPLOYMENT_ID: prod
-    PROJECT: astronomer-cloud-prod
-    DIRECTORY: prod/cloud
-    ZONAL: false
-    GOOGLE_CREDENTIAL_FILE_CONTENT:
-      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
-  commands:
-    - bin/compare_stage_and_prod_cloud.sh
-    - bin/terraform_cloud.sh
-  when:
-    event:
-      - promote
-    status:
-      - success
-    repo:
-      - astronomer/google-environments
-    target:
-      - production
-
-- name: notify_prod_updated
-  image: plugins/slack
-  settings:
-    webhook:
-      from_secret: WEBHOOK_URL
-    channel: ci-debug
-    username: terraform-ci
-    template: >
-      {{repo.name}}
-
-      {{#success build.status}}
-      prod cloud updated! :sunglasses:
-
-      https://app.gcp0001.us-east4.astronomer.io
-      {{else}}
-      ERROR: update of prod cloud failed!
-
-      build link: {{build.link}}
-      {{/success}}
-  when:
-    event:
-      - promote
-    status:
-      - success
-      # - failure
-    repo:
-      - astronomer/google-environments
-    target:
-      - production
+# - name: notify_promotion_production
+#   image: plugins/slack
+#   settings:
+#     webhook:
+#       from_secret: WEBHOOK_URL
+#     channel: ci-debug
+#     username: terraform-ci
+#     template: >
+#       Review the plan output here: {{build.link}}
+# 
+#       To release, run:
+# 
+#       ```
+#       # go to https://cloud.drone.io/account for personal access token
+#       export DRONE_SERVER=https://cloud.drone.io
+#       export DRONE_TOKEN=your-token
+#       drone build promote astronomer/google-environments ${DRONE_BUILD_NUMBER} production
+#       ```
+#   when:
+#     event:
+#       - push
+#     status:
+#       - success
+#     repo:
+#       - astronomer/google-environments
+# 
+# - name: deploy_to_production
+#   image: sjmiller609/helm-kubectl-terraform:latest
+#   environment:
+#     BASE_DOMAIN: gcp0001.us-east4.astronomer.io
+#     DEPLOYMENT_ID: prod
+#     PROJECT: astronomer-cloud-prod
+#     DIRECTORY: prod/cloud
+#     ZONAL: false
+#     GOOGLE_CREDENTIAL_FILE_CONTENT:
+#       from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
+#   commands:
+#     - bin/compare_stage_and_prod_cloud.sh
+#     - bin/terraform_cloud.sh
+#   when:
+#     event:
+#       - promote
+#     status:
+#       - success
+#     repo:
+#       - astronomer/google-environments
+#     target:
+#       - production
+# 
+# - name: notify_prod_updated
+#   image: plugins/slack
+#   settings:
+#     webhook:
+#       from_secret: WEBHOOK_URL
+#     channel: ci-debug
+#     username: terraform-ci
+#     template: >
+#       {{repo.name}}
+# 
+#       {{#success build.status}}
+#       prod cloud updated! :sunglasses:
+# 
+#       https://app.gcp0001.us-east4.astronomer.io
+#       {{else}}
+#       ERROR: update of prod cloud failed!
+# 
+#       build link: {{build.link}}
+#       {{/success}}
+#   when:
+#     event:
+#       - promote
+#     status:
+#       - success
+#       # - failure
+#     repo:
+#       - astronomer/google-environments
+#     target:
+#       - production
