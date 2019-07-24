@@ -46,19 +46,20 @@ if [[ "$CLUSTERS" == *$DEPLOYMENT_ID-cluster* ]]; then
   KUBECONFIG_VAR_LINE="-var kubeconfig_path=$(pwd)/kubeconfig"
 fi
 
+terraform plan \
+  -var "deployment_id=$DEPLOYMENT_ID" \
+  $KUBECONFIG_VAR_LINE \
+  -lock=false \
+  -input=false \
+  -out=$PLAN_FILE
+
 # Do the plan step and quit
-# if TF_PLAN is set
+# if TF_PLAN is set.
+# Otherwise, proceed to the apply step
 if [ $TF_PLAN ]; then
 
 	echo "\n Deleting old Terraform plan file"
 	gsutil rm gs://${STATE_BUCKET}/ci/$PLAN_FILE || echo "\n An old state file does not exist in state bucket, proceeding..."
-
-	terraform plan \
-	  -var "deployment_id=$DEPLOYMENT_ID" \
-    $KUBECONFIG_VAR_LINE \
-	  -lock=false \
-	  -input=false \
-	  -out=$PLAN_FILE
 
 	gsutil cp $PLAN_FILE gs://${STATE_BUCKET}/ci/$PLAN_FILE
   echo "Plan file uploaded"
@@ -71,7 +72,6 @@ fi
 TF_AUTO_APPROVE_LINE=""
 if [ $TF_AUTO_APPROVE ]; then
   TF_AUTO_APPROVE_LINE="--auto-approve"
-  PLAN_FILE=""
 fi
 
 if [ $TF_DESTROY ]; then
@@ -96,8 +96,7 @@ if [ $TF_DESTROY ]; then
     -lock=false \
     -input=false \
     $KUBECONFIG_VAR_LINE \
-    $TF_AUTO_APPROVE_LINE \
-    $PLAN_FILE
+    $TF_AUTO_APPROVE_LINE
 
   exit 0
 fi 
