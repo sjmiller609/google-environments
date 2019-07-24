@@ -28,10 +28,9 @@ data "http" "privkey" {
 module "astronomer_cloud" {
 
   source  = "astronomer/astronomer-cloud/google"
-  version = "0.1.198"
+  version = "0.1.200"
 
   deployment_id    = var.deployment_id
-  dns_managed_zone = "staging-zone"
   email            = "steven@astronomer.io"
   zonal_cluster    = false
   management_api   = "public"
