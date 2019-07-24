@@ -58,8 +58,7 @@ steps:
     BASE_DOMAIN: gcp0001.us-east4.astronomer.io
     # TF_PLAN: true
     TF_AUTO_APPROVE: true
-    # TF_TWO_STEP_APPLY: true
-    TF_DESTROY: true
+    TF_TWO_STEP_APPLY: true
     DEPLOYMENT_ID: prod
     PROJECT: astronomer-cloud-prod
     DIRECTORY: prod/cloud
