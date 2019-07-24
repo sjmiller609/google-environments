@@ -6,6 +6,7 @@ steps:
 - name: deploy_cloud_to_staging
   image: sjmiller609/helm-kubectl-terraform:latest
   environment:
+    BASE_DOMAIN: staging.astronomer.io
     DEPLOYMENT_ID: staging
     PROJECT: astronomer-cloud-staging
     DIRECTORY: stage/cloud
@@ -51,7 +52,10 @@ steps:
 - name: terraform_plan_production
   image: sjmiller609/helm-kubectl-terraform:latest
   environment:
-    TF_PLAN: true
+    BASE_DOMAIN: gcp0001.us-east4.astronomer.io
+    # TF_PLAN: true
+    TF_AUTO_APPROVE: true
+    TF_TWO_STEP_APPLY: true
     DEPLOYMENT_ID: prod
     PROJECT: astronomer-cloud-prod
     DIRECTORY: prod/cloud
@@ -98,6 +102,7 @@ steps:
 - name: deploy_to_production
   image: sjmiller609/helm-kubectl-terraform:latest
   environment:
+    BASE_DOMAIN: gcp0001.us-east4.astronomer.io
     DEPLOYMENT_ID: prod
     PROJECT: astronomer-cloud-prod
     DIRECTORY: prod/cloud

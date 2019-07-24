@@ -71,6 +71,7 @@ if [ $TF_DESTROY ]; then
 
   terraform destroy \
     -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
     -lock=false \
     -input=false \
     $KUBECONFIG_VAR_LINE
@@ -88,6 +89,7 @@ if [ $TF_TWO_STEP_APPLY ]; then
 
   terraform apply \
     -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
     -lock=false \
     -input=false \
     $KUBECONFIG_VAR_LINE \
@@ -96,6 +98,7 @@ if [ $TF_TWO_STEP_APPLY ]; then
 
   terraform apply \
     -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
     -lock=false \
     -input=false \
     $KUBECONFIG_VAR_LINE \
@@ -115,6 +118,7 @@ if [ $TF_PLAN ]; then
 
   terraform plan \
     -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
     $KUBECONFIG_VAR_LINE \
     -lock=false \
     -input=false \
@@ -131,6 +135,7 @@ if [ $TF_AUTO_APPROVE ]; then
   terraform apply \
     --auto-approve \
     -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
     $KUBECONFIG_VAR_LINE \
     -lock=false \
     -input=false
