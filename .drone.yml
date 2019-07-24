@@ -56,9 +56,7 @@ steps:
   image: sjmiller609/helm-kubectl-terraform:latest
   environment:
     BASE_DOMAIN: gcp0001.us-east4.astronomer.io
-    # TF_PLAN: true
-    TF_AUTO_APPROVE: true
-    TF_TWO_STEP_APPLY: true
+    TF_PLAN: true
     DEPLOYMENT_ID: prod
     PROJECT: astronomer-cloud-prod
     DIRECTORY: prod/cloud
@@ -92,7 +90,7 @@ steps:
       # go to https://cloud.drone.io/account for personal access token
       export DRONE_SERVER=https://cloud.drone.io
       export DRONE_TOKEN=your-token
-      drone build promote astronomer/terraform-google-astronomer-cloud ${DRONE_BUILD_NUMBER} production
+      drone build promote astronomer/google-environments ${DRONE_BUILD_NUMBER} production
       ```
   when:
     event:
