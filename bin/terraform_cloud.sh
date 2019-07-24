@@ -44,6 +44,7 @@ if [[ "$CLUSTERS" == *$DEPLOYMENT_ID-cluster* ]]; then
   terraform state pull | jq -r '.resources[] | select(.module == "module.astronomer_cloud") | select(.name == "kubeconfig") | .instances[0].attributes.content' > kubeconfig
   chmod 755 kubeconfig
   KUBECONFIG_VAR_LINE="-var kubeconfig_path=$(pwd)/kubeconfig"
+  export KUBECONFIG=$(pwd)/kubeconfig
 
 fi
 
@@ -54,12 +55,15 @@ if [ $TF_DESTROY ]; then
     exit 1
   fi
 
+  # don't fail if one of these fails
+  set +e
+
   # delete everything from kube
   helm init --client-only
   helm del $(helm ls --all --short) --purge
 
   # this command is blocking
-  kubectl delete namespace astronomer -wait=true
+  kubectl delete namespace astronomer --wait=true
 
   # remove the stuff we just delete from kube from the tf state
   terraform state rm module.astronomer_cloud.module.astronomer
@@ -69,12 +73,16 @@ if [ $TF_DESTROY ]; then
   # remove it from the state to accomplish this
   terraform state rm module.astronomer_cloud.module.gcp.google_sql_user.airflow
 
+  # resume normal failure
+  set -e
+
   terraform destroy \
     -var "deployment_id=$DEPLOYMENT_ID" \
     -var "base_domain=$BASE_DOMAIN" \
     -lock=false \
     -input=false \
-    $KUBECONFIG_VAR_LINE
+    -refresh=false \
+    $KUBECONFIG_VAR_LINE \
     --auto-approve
 
   exit 0
