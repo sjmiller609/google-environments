@@ -88,8 +88,11 @@ steps:
 
       ```
       # go to https://cloud.drone.io/account for personal access token
+
       export DRONE_SERVER=https://cloud.drone.io
+
       export DRONE_TOKEN=your-token
+
       drone build promote astronomer/google-environments ${DRONE_BUILD_NUMBER} production
       ```
   when:
