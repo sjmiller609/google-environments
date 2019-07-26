@@ -10,7 +10,7 @@ variable "kubeconfig_path" {
 module "astronomer_cloud" {
 
   source  = "astronomer/astronomer-cloud/google"
-  version = "0.1.220"
+  version = "0.1.226"
 
   deployment_id          = var.deployment_id
   email                  = "steven@astronomer.io"
