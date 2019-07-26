@@ -10,7 +10,7 @@ variable "kubeconfig_path" {
 module "astronomer_cloud" {
 
   source  = "astronomer/astronomer-cloud/google"
-  version = "0.1.226"
+  version = "0.1.229"
 
   deployment_id          = var.deployment_id
   email                  = "steven@astronomer.io"
@@ -26,4 +26,7 @@ module "astronomer_cloud" {
   tls_key           = data.http.privkey.body
   stripe_secret_key = data.http.stripe_secret_key.body
   stripe_pk         = data.http.stripe_pk.body
+
+  worker_node_size  = local.worker_node_size
+  db_instance_size  = local.db_instance_size
 }
