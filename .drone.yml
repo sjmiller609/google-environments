@@ -82,6 +82,8 @@ steps:
     channel: ci-debug
     username: terraform-ci
     template: >
+      {{repo.name}}
+
       Review the plan output here: {{build.link}}
 
       To release, run:
