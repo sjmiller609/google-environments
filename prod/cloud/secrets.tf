@@ -51,7 +51,7 @@ data "http" "stripe_secret_key" {
 #####
 
 data "google_storage_object_signed_url" "slack_alert_url" {
-  bucket = "${var.deployment_id}-astronomer-certificate"
+  bucket = "${var.deployment_id}-astronomer-secrets"
   path   = "slack_alert_url.txt"
 }
 
