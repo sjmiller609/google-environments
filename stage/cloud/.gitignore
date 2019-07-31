@@ -1,0 +1,5 @@
+kubeconfig
+account.json
+terraform.tfvars
+kubeconfig*
+helm.astronomer.io

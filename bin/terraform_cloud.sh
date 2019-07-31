@@ -46,6 +46,13 @@ if [[ "$CLUSTERS" == *$DEPLOYMENT_ID-cluster* ]]; then
   KUBECONFIG_VAR_LINE="-var kubeconfig_path=$(pwd)/kubeconfig"
   export KUBECONFIG=$(pwd)/kubeconfig
 
+  mkdir -p ~/.kube/
+  cp $KUBECONFIG ~/.kube/config
+  curl -Lo /tmp/tiller-releases-converter https://github.com/dragonsmith/tiller-releases-converter/releases/download/0.1.2/tiller-releases-converter.linux.amd64
+  chmod +x /tmp/tiller-releases-converter
+  /tmp/tiller-releases-converter convert
+  /tmp/tiller-releases-converter secure-tiller
+
 fi
 
 if [ $TF_DESTROY ]; then
@@ -140,6 +147,8 @@ fi
 
 if [ $TF_AUTO_APPROVE ]; then
 
+
+
   terraform apply \
     --auto-approve \
     -var "deployment_id=$DEPLOYMENT_ID" \
@@ -147,6 +156,9 @@ if [ $TF_AUTO_APPROVE ]; then
     $KUBECONFIG_VAR_LINE \
     -lock=false \
     -input=false
+
+  /tmp/tiller-releases-converter cleanup
+  rm ~/.kube/config
 
   exit 0
 fi
@@ -157,3 +169,7 @@ terraform apply \
   -lock=false \
   -input=false \
   $PLAN_FILE
+
+/tmp/tiller-releases-converter cleanup
+rm ~/.kube/config
+
