@@ -17,10 +17,11 @@ module "astronomer_cloud" {
   tls_key           = data.http.privkey.body
   stripe_secret_key = data.http.stripe_secret_key.body
   stripe_pk         = data.http.stripe_pk.body
+  smtp_uri          = data.http.smtp_uri.body
   slack_alert_url   = data.http.slack_alert_url.body
 
   slack_alert_channel = var.slack_alert_channel
 
-  worker_node_size  = local.worker_node_size
-  db_instance_size  = local.db_instance_size
+  worker_node_size = local.worker_node_size
+  db_instance_size = local.db_instance_size
 }
