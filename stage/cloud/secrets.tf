@@ -60,7 +60,7 @@ data "http" "slack_alert_url" {
 }
 
 #####
-# Email (SMTP
+# Email (SMTP)
 #####
 
 data "google_storage_object_signed_url" "smpt_uri" {
