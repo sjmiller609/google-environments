@@ -3,5 +3,3 @@ account.json
 terraform.tfvars
 kubeconfig*
 helm.astronomer.io
-open.sh
-temp
