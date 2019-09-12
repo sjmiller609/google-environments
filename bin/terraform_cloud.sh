@@ -81,7 +81,17 @@ if [ $TF_FORCE_REDEPLOY ]; then
   terraform state rm module.astronomer_cloud.module.system_components.helm_release.istio_init
   helm delete --purge astronomer istio istio-init pg-sqlproxy
 
-  # reapply kube layer
+  # reapply kube layer, making sure to do system components first
+
+  terraform apply \
+    -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
+    -lock=false \
+    -input=false \
+    $KUBECONFIG_VAR_LINE \
+    --target=module.astronomer_cloud.module.system_components \
+    --auto-approve
+
   terraform apply \
     -var "deployment_id=$DEPLOYMENT_ID" \
     -var "base_domain=$BASE_DOMAIN" \
