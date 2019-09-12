@@ -89,7 +89,7 @@ steps:
 
       Review the plan output here: {{build.link}}
 
-      To release, run:
+      To release, configure drone locally:
 
       ```
       # go to https://cloud.drone.io/account for personal access token
@@ -98,7 +98,20 @@ steps:
 
       export DRONE_TOKEN=your-token
 
+      To update everything:
+
+      ```
+
       drone build promote astronomer/google-environments ${DRONE_BUILD_NUMBER} production
+
+      ```
+
+      OR to update only the infrastructure (recommended - do this first):
+
+      ```
+
+      drone build promote astronomer/google-environments ${DRONE_BUILD_NUMBER} production-infra-only
+
       ```
   when:
     event:
@@ -176,6 +189,30 @@ steps:
       - astronomer/google-environments
     target:
       - production
+
+- name: deploy_to_production_infra_only
+  image: sjmiller609/helm-kubectl-terraform:latest
+  environment:
+    BASE_DOMAIN: gcp0001.us-east4.astronomer.io
+    DEPLOYMENT_ID: prod
+    PROJECT: astronomer-cloud-prod
+    DIRECTORY: prod/cloud
+    TF_INFRA_ONLY: true
+    ZONAL: false
+    GOOGLE_CREDENTIAL_FILE_CONTENT:
+      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
+  commands:
+    - bin/compare_stage_and_prod_cloud.sh
+    - bin/terraform_cloud.sh
+  when:
+    event:
+      - promote
+    status:
+      - success
+    repo:
+      - astronomer/google-environments
+    target:
+      - production-infra-only
 
 - name: notify_prod_updated
   image: plugins/slack

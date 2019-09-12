@@ -178,6 +178,22 @@ if [ $TF_PLAN ]; then
 
 	echo "\n Deleting old Terraform plan file"
 	gsutil rm gs://${STATE_BUCKET}/ci/$PLAN_FILE || echo "\n An old state file does not exist in state bucket, proceeding..."
+	gsutil rm gs://${STATE_BUCKET}/ci/$PLAN_FILE-infra-only || echo "\n An old state file does not exist in state bucket, proceeding..."
+
+  terraform plan \
+    -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
+    $KUBECONFIG_VAR_LINE \
+    -lock=false \
+    -input=false \
+    --target=module.astronomer_cloud.module.gcp \
+    -out=$PLAN_FILE-infra-only
+
+	gsutil cp $PLAN_FILE gs://${STATE_BUCKET}/ci/$PLAN_FILE-infra-only
+  echo "Plan file uploaded - infra only"
+
+  echo "############################"
+  echo "############################"
 
   terraform plan \
     -var "deployment_id=$DEPLOYMENT_ID" \
@@ -189,13 +205,12 @@ if [ $TF_PLAN ]; then
 
 	gsutil cp $PLAN_FILE gs://${STATE_BUCKET}/ci/$PLAN_FILE
   echo "Plan file uploaded"
+
   exit 0
 
 fi
 
 if [ $TF_AUTO_APPROVE ]; then
-
-
 
   terraform apply \
     --auto-approve \
@@ -207,6 +222,34 @@ if [ $TF_AUTO_APPROVE ]; then
 
   /tmp/tiller-releases-converter cleanup
   rm ~/.kube/config
+
+  exit 0
+fi
+
+if [ $TF_INFRA_ONLY ]; then
+
+  # apply using plan file
+  gsutil cp gs://${STATE_BUCKET}/ci/$PLAN_FILE-infra-only $PLAN_FILE-infra-only
+  terraform apply \
+    -lock=false \
+    -input=false \
+    $PLAN_FILE-infra-only
+
+  # delete both plan files because they are now expired
+  gsutil rm gs://${STATE_BUCKET}/ci/$PLAN_FILE-infra-only || echo "\n An old state file does not exist in state bucket, proceeding..."
+  gsutil rm gs://${STATE_BUCKET}/ci/$PLAN_FILE || echo "\n An old state file does not exist in state bucket, proceeding..."
+
+  # re-plan
+  terraform plan \
+    -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
+    $KUBECONFIG_VAR_LINE \
+    -lock=false \
+    -input=false \
+    -out=$PLAN_FILE
+
+  gsutil cp $PLAN_FILE gs://${STATE_BUCKET}/ci/$PLAN_FILE
+  echo "Plan file uploaded"
 
   exit 0
 fi
