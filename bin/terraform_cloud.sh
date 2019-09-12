@@ -79,6 +79,7 @@ if [ $TF_FORCE_REDEPLOY ]; then
   terraform state rm module.astronomer_cloud.module.system_components.helm_release.cloud_sql_proxy
   terraform state rm module.astronomer_cloud.module.system_components.helm_release.istio
   terraform state rm module.astronomer_cloud.module.system_components.helm_release.istio_init
+  terraform state rm module.astronomer_cloud.module.system_components.null_resource.helm_repo
   helm delete --purge astronomer istio istio-init pg-sqlproxy
 
   # reapply kube layer, making sure to do system components first
