@@ -189,7 +189,7 @@ if [ $TF_PLAN ]; then
     --target=module.astronomer_cloud.module.gcp \
     -out=$PLAN_FILE-infra-only
 
-	gsutil cp $PLAN_FILE gs://${STATE_BUCKET}/ci/$PLAN_FILE-infra-only
+	gsutil cp $PLAN_FILE-infra-only gs://${STATE_BUCKET}/ci/$PLAN_FILE-infra-only
   echo "Plan file uploaded - infra only"
 
   echo "############################"
