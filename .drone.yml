@@ -1,6 +1,9 @@
 kind: pipeline
 name: astronomer-environments
 
+concurrency:
+  limit: 1
+
 steps:
 
 - name: deploy_cloud_to_staging
@@ -104,6 +107,52 @@ steps:
       - success
     repo:
       - astronomer/google-environments
+
+- name: deploy_to_production_force_redeploy
+  image: sjmiller609/helm-kubectl-terraform:latest
+  environment:
+    BASE_DOMAIN: gcp0001.us-east4.astronomer.io
+    DEPLOYMENT_ID: prod
+    PROJECT: astronomer-cloud-prod
+    DIRECTORY: prod/cloud
+    ZONAL: false
+    TF_FORCE_REDEPLOY: true
+    TF_AUTO_APPROVE: true
+    GOOGLE_CREDENTIAL_FILE_CONTENT:
+      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_PROD
+  commands:
+    - bin/compare_stage_and_prod_cloud.sh
+    - bin/terraform_cloud.sh
+  when:
+    event:
+      - promote
+    repo:
+      - astronomer/google-environments
+    target:
+      - production-force-redeploy
+
+- name: deploy_to_staging_force_redeploy
+  image: sjmiller609/helm-kubectl-terraform:latest
+  environment:
+    BASE_DOMAIN: staging.astronomer.io
+    DEPLOYMENT_ID: staging
+    PROJECT: astronomer-cloud-staging
+    DIRECTORY: stage/cloud
+    ZONAL: false
+    TF_FORCE_REDEPLOY: true
+    TF_AUTO_APPROVE: true
+    GOOGLE_CREDENTIAL_FILE_CONTENT:
+      from_secret: GOOGLE_CREDENTIAL_FILE_CONTENT_STAGING
+  commands:
+    - bin/compare_stage_and_prod_cloud.sh
+    - bin/terraform_cloud.sh
+  when:
+    event:
+      - promote
+    repo:
+      - astronomer/google-environments
+    target:
+      - staging-force-redeploy
 
 - name: deploy_to_production
   image: sjmiller609/helm-kubectl-terraform:latest

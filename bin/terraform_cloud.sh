@@ -39,7 +39,7 @@ if [[ "$CLUSTERS" == *$DEPLOYMENT_ID-cluster* ]]; then
 
   # whitelist our current IP for kube management API
   gcloud container clusters update $DEPLOYMENT_ID-cluster --enable-master-authorized-networks --master-authorized-networks="$(curl icanhazip.com)/32" --zone=us-east4
-  
+
   # copy the kubeconfig from the terraform state
   terraform state pull | jq -r '.resources[] | select(.module == "module.astronomer_cloud") | select(.name == "kubeconfig") | .instances[0].attributes.content' > kubeconfig
   chmod 755 kubeconfig
@@ -53,6 +53,44 @@ if [[ "$CLUSTERS" == *$DEPLOYMENT_ID-cluster* ]]; then
   /tmp/tiller-releases-converter convert
   /tmp/tiller-releases-converter secure-tiller
 
+fi
+
+if [ $TF_FORCE_REDEPLOY ]; then
+
+  if [ ! $TF_AUTO_APPROVE ]; then
+    echo "ERROR: will not destroy without TF_AUTO_APPROVE set"
+    exit 1
+  fi
+
+  helm init --client-only
+
+  # make sure infra is up to date
+  terraform apply \
+    -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
+    -lock=false \
+    -input=false \
+    $KUBECONFIG_VAR_LINE \
+    --auto-approve \
+    --target=module.astronomer_cloud.module.gcp
+
+  # delete helm charts
+  terraform state rm module.astronomer_cloud.module.astronomer.helm_release.astronomer
+  terraform state rm module.astronomer_cloud.module.system_components.helm_release.cloud_sql_proxy
+  terraform state rm module.astronomer_cloud.module.system_components.helm_release.istio
+  terraform state rm module.astronomer_cloud.module.system_components.helm_release.istio_init
+  helm delete --purge astronomer istio istio-init pg-sqlproxy
+
+  # reapply kube layer
+  terraform apply \
+    -var "deployment_id=$DEPLOYMENT_ID" \
+    -var "base_domain=$BASE_DOMAIN" \
+    -lock=false \
+    -input=false \
+    $KUBECONFIG_VAR_LINE \
+    --auto-approve
+
+  exit 0
 fi
 
 if [ $TF_DESTROY ]; then
@@ -164,7 +202,7 @@ if [ $TF_AUTO_APPROVE ]; then
 fi
 
 # apply using plan file
-gsutil cp gs://${STATE_BUCKET}/ci/$PLAN_FILE $PLAN_FILE 
+gsutil cp gs://${STATE_BUCKET}/ci/$PLAN_FILE $PLAN_FILE
 terraform apply \
   -lock=false \
   -input=false \
@@ -172,4 +210,3 @@ terraform apply \
 
 /tmp/tiller-releases-converter cleanup
 rm ~/.kube/config
-
