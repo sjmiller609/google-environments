@@ -91,12 +91,15 @@ steps:
 
       To release, configure drone locally:
 
+      - go to https://cloud.drone.io/account for personal access token
+
       ```
-      # go to https://cloud.drone.io/account for personal access token
 
       export DRONE_SERVER=https://cloud.drone.io
 
       export DRONE_TOKEN=your-token
+
+      ```
 
       To update everything:
 
