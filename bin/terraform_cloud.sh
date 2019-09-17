@@ -55,6 +55,8 @@ if [[ "$CLUSTERS" == *$DEPLOYMENT_ID-cluster* ]]; then
 
 fi
 
+helm repo update
+
 if [ $TF_FORCE_REDEPLOY ]; then
 
   if [ ! $TF_AUTO_APPROVE ]; then
