@@ -235,6 +235,7 @@ if [ $TF_INFRA_ONLY ]; then
   gsutil cp gs://${STATE_BUCKET}/ci/$PLAN_FILE-infra-only $PLAN_FILE-infra-only
   terraform apply \
     -lock=false \
+    -refresh=false \
     -input=false \
     $PLAN_FILE-infra-only
 
@@ -261,6 +262,7 @@ fi
 gsutil cp gs://${STATE_BUCKET}/ci/$PLAN_FILE $PLAN_FILE
 terraform apply \
   -lock=false \
+  -refresh=false \
   -input=false \
   $PLAN_FILE
 
