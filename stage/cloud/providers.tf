@@ -1,12 +1,12 @@
 provider "google" {
-  version = "~> 2.14"
+  version = "~> 2.16"
   region  = "us-east4"
   zone    = "us-east4-a"
   project = "astronomer-cloud-staging"
 }
 
 provider "google-beta" {
-  version = "~> 2.14"
+  version = "~> 2.16"
   region  = "us-east4"
   zone    = "us-east4-a"
   project = "astronomer-cloud-staging"
