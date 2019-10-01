@@ -63,11 +63,24 @@ data "http" "slack_alert_url" {
 # Email (SMTP)
 #####
 
-data "google_storage_object_signed_url" "smpt_uri" {
+data "google_storage_object_signed_url" "smtp_uri" {
   bucket = "${var.deployment_id}-astronomer-secrets"
   path   = "smtp_uri.txt"
 }
 
 data "http" "smtp_uri" {
-  url = data.google_storage_object_signed_url.smpt_uri.signed_url
+  url = data.google_storage_object_signed_url.smtp_uri.signed_url
+}
+
+#####
+# Kubecost Token
+#####
+
+data "google_storage_object_signed_url" "kubecost_token" {
+  bucket = "${var.deployment_id}-astronomer-secrets"
+  path   = "kubecost_token.txt"
+}
+
+data "http" "kubecost_token" {
+  url = data.google_storage_object_signed_url.kubecost_token.signed_url
 }
