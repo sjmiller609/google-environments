@@ -14,7 +14,7 @@ provider "google-beta" {
 
 provider "acme" {
   server_url = "https://acme-v02.api.letsencrypt.org/directory"
-  version = "~> 1.4"
+  version    = "~> 1.4"
 }
 
 provider "http" {
